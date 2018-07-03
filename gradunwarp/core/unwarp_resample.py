@@ -159,12 +159,20 @@ class Unwarper(object):
                 print("PROCESSING VOLUME {}".format(idxVol))
                 tmp_out, tmp_jac = self.non_linear_unwarp_siemens(self.vol.shape, dv, dxyz,
                                                                  m_rcs2lai, m_rcs2lai_nohalf, g_xyz2rcs)
+                # if idxVol == 0:
+                #     self.out =  tmp_out[...,None]
+                #     self.vjacout =  tmp_jac[...,None]
+                # else:
+                #     self.out = np.concatenate((self.out, tmp_out[...,None]), axis=3)
+                #     self.vjacout = np.concatenate((self.vjacout, tmp_jac[...,None]), axis=3)
+
+                # preallocation should help?
                 if idxVol == 0:
-                    self.out =  tmp_out[...,None]
-                    self.vjacout =  tmp_jac[...,None]
-                else:
-                    self.out = np.concatenate((self.out, tmp_out[...,None]), axis=3)
-                    self.vjacout = np.concatenate((self.vjacout, tmp_jac[...,None]), axis=3)
+                    self.out =  np.empty(tmp_out.shape + (self.totalVol,))
+                    self.vjacout =  np.empty(tmp_jac.shape + (self.totalVol,))
+ 
+                self.out[...,idxVol] = tmp_out
+                self.vjacout[...,idxVol] = tmp_jac
             ##### </PAQUETTE>
 
 
