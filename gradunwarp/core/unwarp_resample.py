@@ -23,7 +23,6 @@ import subprocess
 
 log = logging.getLogger('gradunwarp')
 
-
 class Unwarper(object):
     '''
     '''
@@ -46,6 +45,11 @@ class Unwarper(object):
 
         # interpolation order ( 1 = linear)
         self.order = 1
+
+        ##### <PAQUETTE>
+        self.currentVol = 0
+        self.totalVol = vol.shape[3]
+        ##### </PAQUETTE>
 
     def eval_spharm_grid(self, vendor, coeffs):
         ''' 
@@ -149,8 +153,20 @@ class Unwarper(object):
 
         # do the nonlinear unwarp
         if self.vendor == 'siemens':
-            self.out, self.vjacout = self.non_linear_unwarp_siemens(self.vol.shape, dv, dxyz,
+            ##### <PAQUETTE>
+            for idxVol in range(self.totalVol):
+                self.currentVol = idxVol
+                print("PROCESSING VOLUME {}".format(idxVol))
+                tmp_out, tmp_jac = self.non_linear_unwarp_siemens(self.vol.shape, dv, dxyz,
                                                                  m_rcs2lai, m_rcs2lai_nohalf, g_xyz2rcs)
+                if idxVol == 0:
+                    self.out =  tmp_out[...,None]
+                    self.vjacout =  tmp_jac[...,None]
+                else:
+                    self.out = np.concatenate((self.out, tmp_out[...,None]), axis=3)
+                    self.vjacout = np.concatenate((self.vjacout, tmp_jac[...,None]), axis=3)
+            ##### </PAQUETTE>
+
 
     def non_linear_unwarp_siemens(self, volshape, dv, dxyz, m_rcs2lai, m_rcs2lai_nohalf, g_xyz2rcs):
         ''' Performs the crux of the unwarping.
@@ -267,10 +283,15 @@ class Unwarper(object):
 
 
             #im_ = utils.interp3(self.vol, vrcsw.x, vrcsw.y, vrcsw.z)
-            ndimage.interpolation.map_coordinates(self.vol,
+
+
+            ##### <PAQUETTE>
+            ndimage.interpolation.map_coordinates(self.vol[...,self.currentVol],
                                                   vrcsw,
                                                   output=im_,
                                                   order=self.order)
+            ##### </PAQUETTE>
+
             # find NaN voxels, and set them to 0
             im_[np.where(np.isnan(im_))] = 0.
             im_[np.where(np.isinf(im_))] = 0.

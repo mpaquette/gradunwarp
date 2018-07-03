@@ -61,7 +61,14 @@ def get_vol_affine(infile):
         raise ImportError('gradunwarp needs nibabel for I/O of mgz/nifti files.'
                           ' Please install')
     nibimage = nib.load(infile)
-    return nibimage.get_data(), nibimage.get_affine()
+    ##### <PAQUETTE>
+    ddata = nibimage.get_data()
+    if ddata.ndim == 3:
+        # faking 4D data even with 3D data
+        ddata = ddata[:,:,:,None]
+    print('{} Volume(s) detected'.format(ddata.shape[3]))
+    return ddata, nibimage.affine
+    ##### </PAQUETTE>
 
 
 # memoized factorial
