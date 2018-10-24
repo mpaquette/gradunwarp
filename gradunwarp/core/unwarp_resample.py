@@ -338,6 +338,7 @@ class Unwarper(object):
         print
        
         img=nib.Nifti1Image(fullWarp,self.m_rcs2ras)
+        # This is a bit stupid, for every volume it overwrites the same warp file.
         nib.save(img,self.outfilewarp)
         # return image and the jacobian
         return out, vjacout
