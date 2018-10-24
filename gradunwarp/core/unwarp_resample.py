@@ -46,13 +46,12 @@ class Unwarper(object):
         # interpolation order ( 1 = linear)
         self.order = 1
 
-        ##### <PAQUETTE>
+
         self.currentVol = 0
         self.totalVol = vol.shape[3]
-        # init incase of empty
-        print('unwarp_resample.py PAQUETTE')
+        # init path to the old hardcoded default
         self.outfilewarp = "fullWarp_abs.nii.gz"
-        ##### </PAQUETTE>
+
 
     def eval_spharm_grid(self, vendor, coeffs):
         ''' 
@@ -156,7 +155,7 @@ class Unwarper(object):
 
         # do the nonlinear unwarp
         if self.vendor == 'siemens':
-            ##### <PAQUETTE>
+            # loops over volumes
             for idxVol in range(self.totalVol):
                 self.currentVol = idxVol
                 print("PROCESSING VOLUME {}".format(idxVol))
@@ -173,10 +172,10 @@ class Unwarper(object):
                 if idxVol == 0:
                     self.out =  np.empty(tmp_out.shape + (self.totalVol,))
                     self.vjacout =  np.empty(tmp_jac.shape + (self.totalVol,))
- 
+                # uselessly creating a jacobian for each volume
                 self.out[...,idxVol] = tmp_out
                 self.vjacout[...,idxVol] = tmp_jac
-            ##### </PAQUETTE>
+
 
 
     def non_linear_unwarp_siemens(self, volshape, dv, dxyz, m_rcs2lai, m_rcs2lai_nohalf, g_xyz2rcs):
@@ -296,12 +295,10 @@ class Unwarper(object):
             #im_ = utils.interp3(self.vol, vrcsw.x, vrcsw.y, vrcsw.z)
 
 
-            ##### <PAQUETTE>
             ndimage.interpolation.map_coordinates(self.vol[...,self.currentVol],
                                                   vrcsw,
                                                   output=im_,
                                                   order=self.order)
-            ##### </PAQUETTE>
 
             # find NaN voxels, and set them to 0
             im_[np.where(np.isnan(im_))] = 0.
@@ -341,10 +338,7 @@ class Unwarper(object):
         print
        
         img=nib.Nifti1Image(fullWarp,self.m_rcs2ras)
-        # nib.save(img,"fullWarp_abs.nii.gz")
-        ##### <PAQUETTE>
         nib.save(img,self.outfilewarp)
-        ##### </PAQUETTE>
         # return image and the jacobian
         return out, vjacout
 
