@@ -49,6 +49,9 @@ class Unwarper(object):
         ##### <PAQUETTE>
         self.currentVol = 0
         self.totalVol = vol.shape[3]
+        # init incase of empty
+        print('unwarp_resample.py PAQUETTE')
+        self.outfilewarp = "fullWarp_abs.nii.gz"
         ##### </PAQUETTE>
 
     def eval_spharm_grid(self, vendor, coeffs):
@@ -338,7 +341,10 @@ class Unwarper(object):
         print
        
         img=nib.Nifti1Image(fullWarp,self.m_rcs2ras)
-        nib.save(img,"fullWarp_abs.nii.gz")
+        # nib.save(img,"fullWarp_abs.nii.gz")
+        ##### <PAQUETTE>
+        nib.save(img,self.outfilewarp)
+        ##### </PAQUETTE>
         # return image and the jacobian
         return out, vjacout
 

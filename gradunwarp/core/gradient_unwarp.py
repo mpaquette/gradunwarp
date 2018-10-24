@@ -13,7 +13,6 @@ from gradunwarp.core.unwarp_resample import Unwarper
 
 log = globals.get_logger()
 
-
 def argument_parse_gradunwarp():
     '''Arguments parser from the command line
     '''
@@ -25,6 +24,10 @@ def argument_parse_gradunwarp():
                   help='The input warped file (nifti or mgh)')
     p.add_argument('outfile', action='store',
                   help='The output unwarped file (extension should be .nii/.nii.gz/.mgh/.mgz)')
+    ##### <PAQUETTE>
+    p.add_argument('outfilewarp', action='store',
+                  help='The output warpfield file (extension should be .nii/.nii.gz/.mgh/.mgz)')
+    ##### </PAQUETTE>
     p.add_argument('vendor', action='store', choices=['siemens', 'ge'], 
                   help='vendor (either "ge" or "siemens" for now)')
 
@@ -108,6 +111,11 @@ class GradientUnwarpRunner(object):
             self.unwarper.nojac = True
         if hasattr(self.args, 'order') and self.args.order:
             self.unwarper.order = int(self.args.order)
+        ##### <PAQUETTE>
+        print('gradient_unwarp.py PAQUETTE')
+        if hasattr(self.args, 'outfilewarp') and self.args.outfilewarp:
+            self.unwarper.outfilewarp = self.args.outfilewarp
+        ##### </PAQUETTE>
         self.unwarper.run()
 
     def write(self):
