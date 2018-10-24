@@ -24,8 +24,6 @@ def argument_parse_gradunwarp():
                   help='The input warped file (nifti or mgh)')
     p.add_argument('outfile', action='store',
                   help='The output unwarped file (extension should be .nii/.nii.gz/.mgh/.mgz)')
-    p.add_argument('outfilewarp', action='store',
-                  help='The output warpfield file (extension should be .nii/.nii.gz/.mgh/.mgz)')
     p.add_argument('vendor', action='store', choices=['siemens', 'ge'], 
                   help='vendor (either "ge" or "siemens" for now)')
 
@@ -48,7 +46,8 @@ def argument_parse_gradunwarp():
                    help='number of grid points in each direction')
     p.add_argument('--interp_order', dest='order',
                    help='the order of interpolation(1..4) where 1 is linear - default')
-
+    p.add_argument('--outfilewarp', action='store',
+                  help='The output warpfield file (extension should be .nii/.nii.gz/.mgh/.mgz)')
     p.add_argument('--verbose', action='store_true', default=False)
 
     args = p.parse_args()
